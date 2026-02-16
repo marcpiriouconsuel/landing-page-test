@@ -596,7 +596,7 @@ footer {
         text-decoration: underline;
     }
 
-    a[href^="http"]:after {
+    a[href^="http"]:not([href*="consuel.com"]):after {
         content: " (" attr(href) ")";
     }
 }
