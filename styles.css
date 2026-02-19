@@ -1,19 +1,19 @@
 /* ===================================
-   CSS Variables - Yellow Theme
+   CSS Variables - Consuel Brand Colors
    =================================== */
 :root {
-    --cerulean-blue: #FFD700;
-    --cornflower-blue: #FFEB3B;
-    --prussian-blue: #F9A825;
+    --cerulean-blue: #00A2DE;
+    --cornflower-blue: #66AFE9;
+    --prussian-blue: #003247;
     --white: #FFFFFF;
-    --light-gray: #FFFDE7;
-    --medium-gray: #FFF9C4;
+    --light-gray: #F5F7FA;
+    --medium-gray: #E0E4E8;
     --text-dark: #2C3E50;
     --text-light: #5A6C7D;
     --yellow-accent: #FFD54F;
-    --green-accent: #FFD700;
-    --blue-accent: #FFC107;
-    --violet-accent: #FFB300;
+    --green-accent: #66BB6A;
+    --blue-accent: #42A5F5;
+    --violet-accent: #AB47BC;
 }
 
 /* ===================================
@@ -54,12 +54,12 @@ h1 {
 
 h2 {
     font-size: 2rem;
-    color: #F9A825;
+    color: var(--prussian-blue);
 }
 
 h3 {
     font-size: 1.5rem;
-    color: #F9A825;
+    color: var(--prussian-blue);
 }
 
 p {
@@ -84,7 +84,7 @@ p {
    Header
    =================================== */
 header {
-    background: linear-gradient(135deg, #F9A825 0%, #FFD700 100%);
+    background: linear-gradient(135deg, var(--prussian-blue) 0%, var(--cerulean-blue) 100%);
     color: var(--white);
     padding: 2rem 0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -143,14 +143,14 @@ nav a:focus-visible {
    Hero Section
    =================================== */
 .hero {
-    background: linear-gradient(135deg, #FFFDE7 0%, #FFF9C4 100%);
+    background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
     padding: 5rem 0;
     text-align: center;
 }
 
 .hero h2 {
     font-size: 2.5rem;
-    color: #F9A825;
+    color: var(--prussian-blue);
     margin-bottom: 1.5rem;
 }
 
@@ -167,36 +167,36 @@ nav a:focus-visible {
 .cta-button {
     display: inline-block;
     padding: 1rem 2.5rem;
-    background-color: #FFD700;
-    color: #2C3E50;
+    background-color: var(--cerulean-blue);
+    color: var(--white);
     text-decoration: none;
     font-weight: 600;
     font-size: 1.1rem;
     border-radius: 50px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 162, 222, 0.3);
 }
 
 .cta-button:hover,
 .cta-button:focus {
-    background-color: #F9A825;
+    background-color: var(--prussian-blue);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 162, 222, 0.4);
     outline: none;
 }
 
 .cta-button:focus-visible {
-    outline: 3px solid #FFD700;
+    outline: 3px solid var(--cerulean-blue);
     outline-offset: 3px;
 }
 
 .cta-button.secondary {
-    background-color: #F9A825;
+    background-color: var(--prussian-blue);
 }
 
 .cta-button.secondary:hover,
 .cta-button.secondary:focus {
-    background-color: #FFD700;
+    background-color: var(--cerulean-blue);
 }
 
 /* ===================================
@@ -214,21 +214,21 @@ nav a:focus-visible {
 }
 
 .content-card {
-    background-color: #FFFDE7;
+    background-color: var(--light-gray);
     padding: 2rem;
     border-radius: 8px;
-    border-left: 4px solid #FFD700;
+    border-left: 4px solid var(--cerulean-blue);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .content-card:hover,
 .content-card:focus-within {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 162, 222, 0.15);
 }
 
 .content-card h3 {
-    color: #F9A825;
+    color: var(--cerulean-blue);
     margin-bottom: 1rem;
 }
 
@@ -236,7 +236,7 @@ nav a:focus-visible {
    Services Section
    =================================== */
 .services {
-    background-color: #FFFDE7;
+    background-color: var(--light-gray);
 }
 
 .services-grid {
@@ -258,7 +258,7 @@ nav a:focus-visible {
 .service-card:hover,
 .service-card:focus-within {
     transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 12px 30px rgba(0, 162, 222, 0.2);
 }
 
 .service-icon {
@@ -269,7 +269,7 @@ nav a:focus-visible {
 }
 
 .service-card h3 {
-    color: #F9A825;
+    color: var(--prussian-blue);
     margin-bottom: 1rem;
     font-size: 1.3rem;
 }
@@ -324,26 +324,26 @@ nav a:focus-visible {
 }
 
 .cert-yellow {
-    background: linear-gradient(135deg, #FFD700 0%, #FFEB3B 100%);
+    background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
 }
 
 .cert-green {
-    background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
+    background: linear-gradient(135deg, #66BB6A 0%, #81C784 100%);
 }
 
 .cert-blue {
-    background: linear-gradient(135deg, #FFB300 0%, #FFC107 100%);
+    background: linear-gradient(135deg, #42A5F5 0%, #64B5F6 100%);
 }
 
 .cert-violet {
-    background: linear-gradient(135deg, #F9A825 0%, #FFB300 100%);
+    background: linear-gradient(135deg, #AB47BC 0%, #BA68C8 100%);
 }
 
 /* ===================================
    Contact Section
    =================================== */
 .contact {
-    background-color: #FFFDE7;
+    background-color: var(--light-gray);
 }
 
 .contact-grid {
@@ -355,7 +355,7 @@ nav a:focus-visible {
 
 .contact-info h3,
 .contact-cta h3 {
-    color: #F9A825;
+    color: var(--prussian-blue);
     margin-bottom: 1rem;
 }
 
@@ -370,7 +370,7 @@ nav a:focus-visible {
 }
 
 .contact-list a {
-    color: #F9A825;
+    color: var(--cerulean-blue);
     text-decoration: none;
     font-weight: 500;
 }
@@ -384,7 +384,7 @@ nav a:focus-visible {
     background-color: var(--white);
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 162, 222, 0.1);
 }
 
 .contact-cta p {
@@ -395,7 +395,7 @@ nav a:focus-visible {
    Footer
    =================================== */
 footer {
-    background-color: #F9A825;
+    background-color: var(--prussian-blue);
     color: var(--white);
     padding: 3rem 0 1rem;
 }
@@ -408,7 +408,7 @@ footer {
 }
 
 .footer-section h3 {
-    color: #FFD700;
+    color: var(--cerulean-blue);
     margin-bottom: 1rem;
     font-size: 1.2rem;
 }
@@ -434,7 +434,7 @@ footer {
 
 .footer-section a:hover,
 .footer-section a:focus {
-    color: #FFD700;
+    color: var(--cerulean-blue);
 }
 
 .footer-bottom {
@@ -456,7 +456,7 @@ footer {
     position: absolute;
     top: -40px;
     left: 0;
-    background: #FFD700;
+    background: var(--cerulean-blue);
     color: var(--white);
     padding: 8px;
     text-decoration: none;
@@ -469,7 +469,7 @@ footer {
 
 /* Focus visible styles */
 *:focus-visible {
-    outline: 3px solid #FFD700;
+    outline: 3px solid var(--cerulean-blue);
     outline-offset: 2px;
 }
 
