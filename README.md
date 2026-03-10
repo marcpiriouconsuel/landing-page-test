@@ -2,6 +2,15 @@
 
 Landing page professionnelle pour le CONSUEL (Comité National pour la Sécurité des Usagers de l'Électricité).
 
+## 🌐 Accès en ligne (GitHub Pages)
+
+| Page | URL |
+|------|-----|
+| 🏠 Landing page | https://marcpiriouconsuel.github.io/landing-page-test/ |
+| 🏐 Jeu de balle au prisonnier | https://marcpiriouconsuel.github.io/landing-page-test/game.html |
+
+> Le déploiement s'effectue automatiquement à chaque push sur `main` via GitHub Actions.
+
 ## 📋 Description
 
 Page web présentant la société Consuel et ses activités dans le domaine de la certification et du contrôle des installations électriques en France.
@@ -37,7 +46,9 @@ Puis accédez à `http://localhost:8000/index.html`
 
 - `index.html` - Page principale avec structure HTML sémantique
 - `styles.css` - Feuille de styles CSS avec design responsive
+- `game.html` - Jeu de balle au prisonnier multijoueur tactile (2 équipes, même écran)
 - `ACCESSIBILITY.md` - Documentation détaillée sur l'accessibilité
+- `.github/workflows/deploy-pages.yml` - Workflow de déploiement GitHub Pages
 
 ## ♿ Accessibilité
 
