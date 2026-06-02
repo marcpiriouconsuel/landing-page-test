@@ -165,72 +165,72 @@
     'use strict';
 
     const GOOGLE_MAPS_API_KEY = 'AIzaSyCV5hzm_XpjdPismhstPTUZdhFxmwXCsPY';
-    const CITY_CENTER = { lat: 43.3215, lng: -1.9830 }; // Plaza de Zaragoza
+    const CITY_CENTER = { lat: 43.31708, lng: -1.98532 }; // Plaza de Zaragoza, 3 (20007)
 
     const BARS = [
       {
-        name: 'Antonio Bar',
+        name: 'Casa Vallés',
+        type: 'Bar à pintxos historique',
+        query: 'Casa Vallés, Reyes Católicos, Donostia',
+        fallback: { lat: 43.3154, lng: -1.9840 },
+        address: 'Calle Reyes Católicos, 10',
+        summary: "Institution depuis 1942, berceau de la « gilda » — le pintxo emblématique piment guindilla, anchois et olive. Les clients louent l'atmosphère authentique, le service attentionné et la qualité des pintxos traditionnels, notamment l'omelette de morue."
+      },
+      {
+        name: 'Bar Iturrioz',
         type: 'Bar à pintxos',
-        query: 'Antonio Bar, Calle Bergara, Donostia',
-        fallback: { lat: 43.3197, lng: -1.9805 },
-        address: 'Calle Bergara, 3',
-        summary: "Célèbre pour sa tortilla de patatas préparée avec 28 œufs, considérée comme l'une des meilleures de la ville. Les pintxos maison — anchois, croquettes et raviolis à la sauce Martini — sont exemplaires. Service impeccable dès l'ouverture à 7h30, très apprécié des locaux."
+        query: 'Bar Iturrioz, Calle San Martín, Donostia',
+        fallback: { lat: 43.3168, lng: -1.9838 },
+        address: 'Calle San Martín, 30',
+        summary: "Sous les arcades de la Calle San Martín, face à la cathédrale du Buen Pastor. Pintxos élégants et authentiques — joue de bœuf, foie gras, anguille fumée, morue salée. Produits de qualité, service compétent et atmosphère chaleureuse d'un lieu emblématique."
       },
       {
-        name: 'Bar Sport',
-        type: 'Bar à pintxos chauds',
-        query: 'Bar Sport pintxos, Fermín Calbetón, Donostia',
-        fallback: { lat: 43.3186, lng: -1.9822 },
-        address: 'Fermín Calbetón Kalea, 10',
-        summary: "L'un des bars les plus populaires de la Parte Vieja, noté parmi les 10 meilleurs de la ville. Célèbre pour son foie gras grillé sur toast croustillant et sa tortilla aux fruits de mer. Ingrédients frais garantis et un soin particulier apporté à chaque pintxo."
+        name: 'Bar Narru',
+        type: 'Bar à pintxos',
+        query: 'Bar Narru, Calle San Martín, Donostia',
+        fallback: { lat: 43.3167, lng: -1.9840 },
+        address: 'Calle San Martín, 22',
+        summary: "Face à la cathédrale du Buen Pastor, sous la houlette du chef Iñigo Peña (formé chez Arzak, Berasategui et Mugaritz). Pintxos classiques revisités et belle carte des vins ; les croquettes de jambon et les torreznos sont particulièrement appréciés."
       },
       {
-        name: 'Borda Berri',
-        type: 'Bar à pintxos chauds',
-        query: 'Borda Berri, Fermín Calbetón, Donostia',
-        fallback: { lat: 43.3185, lng: -1.9821 },
-        address: 'Fermín Calbetón Kalea, 12',
-        summary: "Temple des pintxos chauds préparés à la commande, régulièrement classé dans le top 20 de la ville. Les joues de bœuf braisées au vin rouge et les oreilles de porc tendres et croustillantes sont légendaires. Atmosphère vibrante et service passionné."
+        name: 'Sebastopol Cocktail Bar',
+        type: 'Bar à cocktails & pintxos',
+        query: 'Sebastopol Cocktail Bar, Calle San Martín, Donostia',
+        fallback: { lat: 43.3170, lng: -1.9818 },
+        address: 'Calle San Martín, 39',
+        summary: "Au cœur dynamique de la Calle San Martín, un cadre décontracté pour pintxos, vermouth, bière locale et cocktails créatifs. Ambiance amicale de quartier, généreuse sélection de tapas et clientèle locale — idéal pour l'apéritif."
       },
       {
-        name: 'Ganbara',
-        type: 'Bar à pintxos gastronomique',
-        query: 'Ganbara bar pintxos, San Jerónimo, Donostia',
-        fallback: { lat: 43.3188, lng: -1.9825 },
-        address: 'C. de San Jerónimo, 21',
-        summary: "Institution gastronomique depuis 1984, sélectionnée par le Guide Michelin. Célèbre pour ses champignons sautés à la perfection et son txangurro (crabe farci à la donostiarra). L'équilibre parfait entre bar décontracté et cuisine d'exception."
+        name: 'Bar Ciaboga',
+        type: 'Bar à pintxos (Bib Gourmand)',
+        query: 'Bar Ciaboga, Calle Easo, Donostia',
+        fallback: { lat: 43.3158, lng: -1.9845 },
+        address: 'Calle Easo, 9',
+        summary: "Célèbre dans tout Donostia pour ses patatas al ajillo (pommes de terre à l'ail) servies depuis vingt ans. Tortillas savoureuses et pintxos simples mais délicieux, à prix abordable. Reconnu par le Bib Gourmand du Guide Michelin."
       },
       {
-        name: 'Txepetxa',
-        type: 'Bar à anchois',
-        query: 'Bar Txepetxa, Calle Pescadería, Donostia',
-        fallback: { lat: 43.3190, lng: -1.9835 },
-        address: 'Calle Pescadería, 5',
-        summary: "Institution centenaire et lauréate du « Meilleur pintxo 2022 », entièrement dédiée à l'anchois (bocarte). Depuis 1972, trois générations de la même famille proposent des combinaisons surprenantes sur pain grillé avec un vinaigre blanc maison. Une référence absolue de la culture pintxos."
+        name: 'El Nido',
+        type: 'Pub & bar à cocktails',
+        query: 'El Nido bar, Calle Larramendi, Donostia',
+        fallback: { lat: 43.3163, lng: -1.9847 },
+        address: 'Calle Larramendi, 13',
+        summary: "Pub mythique du centre, ouvert de l'après-midi jusque tard dans la nuit. Excellente sélection de cocktails et de boissons dans une atmosphère décontractée qui change au fil des heures — un rendez-vous apprécié des locaux."
       },
       {
-        name: 'Bar Martínez',
-        type: 'Bar à pintxos chauds',
-        query: 'Bar Martínez, Calle 31 de Agosto, Donostia',
-        fallback: { lat: 43.3182, lng: -1.9828 },
-        address: 'Calle 31 de Agosto, 13',
-        summary: "Depuis 1942, un comptoir de neuf mètres débordant de pintxos soignés. Poivrons rouges farcis au thon, brochette de poulpe et charlota au crabe sont les signatures. Classé parmi les 400 meilleurs restaurants d'Europe par Opinionated About Dining."
+        name: 'Bar Udaberri',
+        type: 'Café & bar à pintxos',
+        query: 'Bar Udaberri, Calle Larramendi, Donostia',
+        fallback: { lat: 43.3162, lng: -1.9849 },
+        address: 'Calle Larramendi, 8',
+        summary: "Établissement de charme datant des années 1930, à l'intérieur vintage. Mélange de café contemporain et de tradition basque, avec une belle sélection de pintxos locaux. Apprécié des habitants pour ses copieux petits-déjeuners et son ambiance rétro."
       },
       {
-        name: 'La Cuchara de San Telmo',
-        type: 'Bar à pintxos modernes',
-        query: 'La Cuchara de San Telmo, Donostia',
-        fallback: { lat: 43.3177, lng: -1.9805 },
-        address: 'Calle 31 de Agosto, 28',
-        summary: "Pionnier du pintxo chaud et créatif, avec plus de 10 000 avis élogieux. Les cannelloni maison et le foie gras à la compote de pommes sont devenus des classiques. Attendez-vous à faire la queue — ça en vaut chaque minute."
-      },
-      {
-        name: 'Zazpi',
-        type: 'Bar à pintxos haute cuisine',
-        query: 'Zazpi taberna, Calle San Marcial, Donostia',
-        fallback: { lat: 43.3218, lng: -1.9836 },
-        address: 'Calle San Marcial, 7',
-        summary: "Zazpi (« sept » en basque) propose de la haute cuisine en format pintxo, dans une rue piétonne à deux pas de la Plaza de Zaragoza. Pintxos innovants et créatifs, apprécié autant des travailleurs locaux que des visiteurs qui fuient la Vieille Ville surpeuplée."
+        name: 'Café Caravanserai',
+        type: 'Café & terrasse',
+        query: 'Café Caravanserai, Plaza del Buen Pastor, Donostia',
+        fallback: { lat: 43.3166, lng: -1.9844 },
+        address: 'Plaza del Buen Pastor, 12',
+        summary: "Idéalement situé sur la Plaza del Buen Pastor avec vue directe sur la cathédrale. Établissement informel à la cuisine ouverte en continu — parfait pour une pause ou un déjeuner décontracté. Emplacement privilégié et atmosphère cosmopolite."
       }
     ];
 
