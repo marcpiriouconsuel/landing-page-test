@@ -22,15 +22,31 @@
       margin-bottom: 2rem;
     }
 
-    img {
+    svg.burger {
       width: 320px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      height: 320px;
+      drop-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
   </style>
 </head>
 <body>
   <h1>Bienvenue</h1>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Grilled_Burger.jpg/640px-Grilled_Burger.jpg" alt="burger">
+  <svg class="burger" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="45" rx="80" ry="38" fill="#e8a438"/>
+    <ellipse cx="100" cy="35" rx="78" ry="30" fill="#f5b942"/>
+    <ellipse cx="80" cy="26" rx="5" ry="3" fill="#d4922a" transform="rotate(-20 80 26)"/>
+    <ellipse cx="105" cy="20" rx="5" ry="3" fill="#d4922a" transform="rotate(10 105 20)"/>
+    <ellipse cx="128" cy="28" rx="5" ry="3" fill="#d4922a" transform="rotate(-10 128 28)"/>
+    <path d="M18 75 Q30 62 50 70 Q65 58 85 68 Q100 56 120 66 Q140 54 160 64 Q175 58 182 70 L182 80 Q165 72 150 78 Q132 66 115 76 Q98 64 78 74 Q60 62 42 72 Q28 66 18 75Z" fill="#5cb85c"/>
+    <rect x="20" y="78" width="160" height="14" rx="4" fill="#e05252"/>
+    <line x1="60" y1="78" x2="60" y2="92" stroke="#c73e3e" stroke-width="1"/>
+    <line x1="100" y1="78" x2="100" y2="92" stroke="#c73e3e" stroke-width="1"/>
+    <line x1="140" y1="78" x2="140" y2="92" stroke="#c73e3e" stroke-width="1"/>
+    <polygon points="15,92 185,92 192,104 8,104" fill="#f0c040"/>
+    <rect x="16" y="102" width="168" height="26" rx="8" fill="#7a3b1e"/>
+    <rect x="16" y="102" width="168" height="10" rx="6" fill="#8b4520"/>
+    <ellipse cx="100" cy="140" rx="82" ry="18" fill="#e8a438"/>
+    <ellipse cx="100" cy="136" rx="82" ry="14" fill="#f5c96a"/>
+  </svg>
 </body>
 </html>
