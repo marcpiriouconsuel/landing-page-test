@@ -3,50 +3,401 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenue</title>
+  <meta name="description" content="Les meilleurs glaciers de Saint-Sébastien (Donostia)">
+  <title>Les meilleurs glaciers de Saint-Sébastien</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍦</text></svg>">
   <style>
+    :root {
+      --bg: #fff7f0;
+      --card: #ffffff;
+      --accent: #e8533f;
+      --accent-soft: #ffe3db;
+      --text: #2c2420;
+      --muted: #8a7f78;
+      --star: #f5a623;
+      --shadow: 0 6px 24px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header.app-header {
+      padding: 1.4rem 1.6rem;
+      background: linear-gradient(135deg, #e8533f, #f5a623);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    header.app-header h1 {
+      margin: 0;
+      font-size: 1.7rem;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+    }
+    header.app-header p {
+      margin: .35rem 0 0;
+      opacity: .92;
+      font-size: .95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 440px) 1fr;
+      height: calc(100vh - 92px);
+    }
+
+    /* Liste des glaciers */
+    .list-pane {
+      overflow-y: auto;
+      padding: 1.1rem;
+    }
+    .glacier-card {
+      display: flex;
+      gap: .9rem;
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: .8rem;
+      margin-bottom: .9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+    .glacier-card:hover { transform: translateY(-2px); }
+    .glacier-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 8px 28px rgba(232,83,63,0.25);
+    }
+    .glacier-photo {
+      width: 104px;
+      height: 104px;
+      flex: 0 0 104px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23e8533f' stroke-width='1.5'%3E%3Cpath d='M4 13a4 4 0 0 1 4-4h0a4 4 0 0 1 8 0 4 4 0 0 1 0 8H8a4 4 0 0 1-4-4z'/%3E%3C/svg%3E") center/40px no-repeat;
+    }
+    .glacier-body { min-width: 0; flex: 1; }
+    .glacier-name {
+      margin: 0 0 .2rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .glacier-rating {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+    .stars { color: var(--star); letter-spacing: 1px; }
+    .glacier-summary {
+      margin: 0;
+      font-size: .85rem;
+      line-height: 1.4;
+      color: #5c534d;
+    }
+    .glacier-addr {
+      margin: .4rem 0 0;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    /* Carte */
+    .map-pane { position: relative; }
+    #map { width: 100%; height: 100%; }
+    #map-fallback {
+      display: none;
+      position: absolute;
+      inset: 0;
       align-items: center;
       justify-content: center;
-      background: #fdf6ec;
-      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      background: var(--accent-soft);
     }
 
-    h1 {
-      font-size: 3rem;
-      color: #333;
-      margin-bottom: 2rem;
-    }
-
-    svg.burger {
-      width: 320px;
-      height: 320px;
-      drop-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .map-pane { height: 60vh; order: -1; }
+      .list-pane { overflow: visible; }
     }
   </style>
 </head>
 <body>
-  <h1>Bienvenue</h1>
-  <svg class="burger" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="45" rx="80" ry="38" fill="#e8a438"/>
-    <ellipse cx="100" cy="35" rx="78" ry="30" fill="#f5b942"/>
-    <ellipse cx="80" cy="26" rx="5" ry="3" fill="#d4922a" transform="rotate(-20 80 26)"/>
-    <ellipse cx="105" cy="20" rx="5" ry="3" fill="#d4922a" transform="rotate(10 105 20)"/>
-    <ellipse cx="128" cy="28" rx="5" ry="3" fill="#d4922a" transform="rotate(-10 128 28)"/>
-    <path d="M18 75 Q30 62 50 70 Q65 58 85 68 Q100 56 120 66 Q140 54 160 64 Q175 58 182 70 L182 80 Q165 72 150 78 Q132 66 115 76 Q98 64 78 74 Q60 62 42 72 Q28 66 18 75Z" fill="#5cb85c"/>
-    <rect x="20" y="78" width="160" height="14" rx="4" fill="#e05252"/>
-    <line x1="60" y1="78" x2="60" y2="92" stroke="#c73e3e" stroke-width="1"/>
-    <line x1="100" y1="78" x2="100" y2="92" stroke="#c73e3e" stroke-width="1"/>
-    <line x1="140" y1="78" x2="140" y2="92" stroke="#c73e3e" stroke-width="1"/>
-    <polygon points="15,92 185,92 192,104 8,104" fill="#f0c040"/>
-    <rect x="16" y="102" width="168" height="26" rx="8" fill="#7a3b1e"/>
-    <rect x="16" y="102" width="168" height="10" rx="6" fill="#8b4520"/>
-    <ellipse cx="100" cy="140" rx="82" ry="18" fill="#e8a438"/>
-    <ellipse cx="100" cy="136" rx="82" ry="14" fill="#f5c96a"/>
-  </svg>
+  <header class="app-header">
+    <h1>🍦 Les meilleurs glaciers de Saint-Sébastien</h1>
+    <p>Donostia, Pays basque espagnol — cliquez sur un glacier pour le situer sur la carte.</p>
+  </header>
+
+  <div class="layout">
+    <section class="list-pane" id="list-pane" aria-label="Liste des glaciers"></section>
+    <section class="map-pane">
+      <div id="map"></div>
+      <div id="map-fallback">
+        <div>
+          <p><strong>La carte n'a pas pu se charger.</strong></p>
+          <p>Vérifiez que la clé API Google Maps est valide et que « Maps JavaScript API » et « Places API (New) » sont activées.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    'use strict';
+
+    // ⚠️ Clé restreinte par référent HTTP à marcpiriouconsuel.github.io/*
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyCV5hzm_XpjdPismhstPTUZdhFxmwXCsPY';
+
+    // Centre de Donostia
+    const CITY_CENTER = { lat: 43.3215, lng: -1.9840 };
+
+    // Glaciers (résumés d'avis rédigés ; note/photo/position chargées en direct via Places)
+    const GLACIERS = [
+      {
+        name: 'Gelatería Boulevard',
+        query: 'Gelatería Boulevard, Alameda del Boulevard, Donostia',
+        fallback: { lat: 43.3224219, lng: -1.9838889 },
+        address: 'Alameda del Boulevard, 10',
+        summary: "Régulièrement classé n°1 de la ville. Immense choix de parfums savoureux, portions généreuses et personnel sympathique. Spécialités : chocolat noir et framboise, avec d'excellentes options vegan."
+      },
+      {
+        name: 'Carlos Arribas (Maestro Heladero)',
+        query: 'Carlos Arribas heladería, Portu Kalea, Donostia',
+        fallback: { lat: 43.3236, lng: -1.9856 },
+        address: 'Portu Kalea, 22 (Vieille ville)',
+        summary: "Maître glacier depuis 1990, glaces artisanales 100% naturelles. 48 parfums dont des sorbets aux vrais morceaux de fruits. Coups de cœur : riz au lait, pistache, et des créations originales."
+      },
+      {
+        name: 'Heladería · Pastelería Oiartzun',
+        query: 'Pastelería Oiartzun, Igentea Kalea, Donostia',
+        fallback: { lat: 43.3221337, lng: -1.9855267 },
+        address: 'Igentea Kalea, 2',
+        summary: "Une institution à l'entrée de la vieille ville : 52 parfums (beaucoup sans gluten et vegan), faits maison chaque jour. Très apprécié pour sa qualité et ses pâtisseries maison."
+      },
+      {
+        name: 'Papperino Il Gelato',
+        query: 'Papperino Ilgelato, San Frantzisko Kalea, Donostia',
+        fallback: { lat: 43.3240, lng: -1.9848 },
+        address: 'San Frantzisko Kalea, 12',
+        summary: "Gelato artisanal fait maison à partir d'ingrédients frais. La pistache est la spécialité de la maison, suivie du cheesecake citron et framboise. Service chaleureux."
+      },
+      {
+        name: 'Heladería Arnoldo',
+        query: 'Heladería Arnoldo, Garibai, Donostia',
+        fallback: { lat: 43.3198, lng: -1.9826 },
+        address: 'Garibai, 2',
+        summary: "Le plus ancien glacier de la ville (depuis 1935). Recettes familiales italiennes, célèbre pour ses glaces chocolat et café au goût intense. Propose aussi des esquimaux artisanaux."
+      },
+      {
+        name: 'Heladería La Veneziana',
+        query: 'Heladería La Veneziana, Garibai Kalea, Donostia',
+        fallback: { lat: 43.3197, lng: -1.9827 },
+        address: 'Garibai Kalea, 4',
+        summary: "Glacier artisanal depuis 1980, ~35 parfums faits maison. Souvent décrit comme « l'une des meilleures glaces jamais goûtées », à prix très raisonnables, avec un coin salon."
+      },
+      {
+        name: 'Loco Polo',
+        query: 'Loco Polo, Narrika Kalea, Donostia',
+        fallback: { lat: 43.3233, lng: -1.9852 },
+        address: 'Narrika Kalea, 10',
+        summary: "Atelier de polos (esquimaux) artisanaux fondé en 2017. Glaces sur bâton personnalisables avec enrobages et toppings. Parfums originaux et service impeccable."
+      },
+      {
+        name: 'Hogar Dulce Hogar',
+        query: 'Hogar Dulce Hogar, Bermingham Kalea, Donostia',
+        fallback: { lat: 43.3247, lng: -1.9776 },
+        address: 'Bermingham Kalea, 1 (Gros)',
+        summary: "Pâtisserie-café-glacier artisanal du quartier Gros. Churros, café, pâtisseries et glaces. Cadre moderne, personnel sympathique, prix abordables."
+      }
+    ];
+
+    let map, infoWindow;
+    const cardEls = [];   // éléments DOM par index
+    const markers = [];   // marqueurs par index
+    let activeIndex = -1;
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str == null ? '' : String(str)));
+      return div.innerHTML;
+    }
+
+    function starString(rating) {
+      if (!rating) return '';
+      const full = Math.round(rating);
+      return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5 - full);
+    }
+
+    // Construit la liste (placeholders) immédiatement
+    function buildList() {
+      const pane = document.getElementById('list-pane');
+      GLACIERS.forEach(function (g, i) {
+        const card = document.createElement('article');
+        card.className = 'glacier-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.innerHTML =
+          '<img class="glacier-photo" alt="' + escapeHTML(g.name) + '">' +
+          '<div class="glacier-body">' +
+            '<h2 class="glacier-name">' + escapeHTML(g.name) + '</h2>' +
+            '<div class="glacier-rating" data-role="rating">Chargement des avis…</div>' +
+            '<p class="glacier-summary">' + escapeHTML(g.summary) + '</p>' +
+            '<p class="glacier-addr">📍 ' + escapeHTML(g.address) + '</p>' +
+          '</div>';
+        card.addEventListener('click', function () { selectGlacier(i); });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectGlacier(i); }
+        });
+        pane.appendChild(card);
+        cardEls[i] = card;
+      });
+    }
+
+    function selectGlacier(i) {
+      const marker = markers[i];
+      if (!marker || !map) return;
+
+      if (activeIndex >= 0 && cardEls[activeIndex]) {
+        cardEls[activeIndex].classList.remove('active');
+      }
+      activeIndex = i;
+      cardEls[i].classList.add('active');
+
+      map.panTo(marker.position);
+      map.setZoom(17);
+
+      // Met en exergue le marqueur sélectionné
+      markers.forEach(function (m, idx) {
+        if (!m) return;
+        m.content = makePin(idx + 1, idx === i);
+        m.zIndex = idx === i ? 999 : 1;
+      });
+
+      const g = GLACIERS[i];
+      const ratingTxt = g._rating
+        ? '<div style="color:#f5a623">' + starString(g._rating) + ' ' + g._rating.toFixed(1) +
+          ' <span style="color:#888">(' + (g._count || 0) + ' avis)</span></div>'
+        : '';
+      infoWindow.setContent(
+        '<div style="font-family:sans-serif;max-width:220px">' +
+          '<strong style="font-size:1rem">' + escapeHTML(g.name) + '</strong>' +
+          ratingTxt +
+          '<div style="font-size:.8rem;color:#666;margin-top:2px">📍 ' + escapeHTML(g.address) + '</div>' +
+        '</div>'
+      );
+      infoWindow.open({ map: map, anchor: marker });
+      cardEls[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function makePin(label, active) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText =
+        'transform:translateY(-2px);font:700 13px sans-serif;color:#fff;' +
+        'width:' + (active ? 36 : 28) + 'px;height:' + (active ? 36 : 28) + 'px;' +
+        'display:flex;align-items:center;justify-content:center;border-radius:50% 50% 50% 0;' +
+        'background:' + (active ? '#e8533f' : '#f5a623') + ';' +
+        'box-shadow:0 2px 6px rgba(0,0,0,.4);border:2px solid #fff;' +
+        'transform:rotate(-45deg) scale(' + (active ? 1.05 : 1) + ');';
+      const inner = document.createElement('span');
+      inner.textContent = label;
+      inner.style.transform = 'rotate(45deg)';
+      wrap.appendChild(inner);
+      return wrap;
+    }
+
+    async function initMap() {
+      const { Map, InfoWindow } = await google.maps.importLibrary('maps');
+      const { Place } = await google.maps.importLibrary('places');
+      const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+
+      map = new Map(document.getElementById('map'), {
+        center: CITY_CENTER,
+        zoom: 15,
+        mapId: 'GLACIERS_DONOSTIA_MAP',
+        mapTypeControl: false,
+        streetViewControl: false
+      });
+      infoWindow = new InfoWindow();
+
+      for (let i = 0; i < GLACIERS.length; i++) {
+        const g = GLACIERS[i];
+        let position = g.fallback;
+        let photoUri = null;
+
+        try {
+          const res = await Place.searchByText({
+            textQuery: g.query,
+            fields: ['displayName', 'location', 'photos', 'rating', 'userRatingCount'],
+            maxResultCount: 1,
+            locationBias: CITY_CENTER
+          });
+          const place = res.places && res.places[0];
+          if (place) {
+            if (place.location) {
+              position = { lat: place.location.lat(), lng: place.location.lng() };
+            }
+            if (place.rating) {
+              g._rating = place.rating;
+              g._count = place.userRatingCount || 0;
+            }
+            if (place.photos && place.photos.length) {
+              photoUri = place.photos[0].getURI({ maxWidth: 320, maxHeight: 320 });
+            }
+          }
+        } catch (e) {
+          // garde le fallback ; la note restera vide
+        }
+
+        // Mise à jour de la carte (DOM)
+        const card = cardEls[i];
+        if (photoUri) card.querySelector('.glacier-photo').src = photoUri;
+        const ratingEl = card.querySelector('[data-role="rating"]');
+        if (g._rating) {
+          ratingEl.innerHTML =
+            '<span class="stars">' + starString(g._rating) + '</span>' +
+            '<span>' + g._rating.toFixed(1) + ' · ' + g._count + ' avis</span>';
+        } else {
+          ratingEl.textContent = 'Note non disponible';
+        }
+
+        const marker = new AdvancedMarkerElement({
+          map: map,
+          position: position,
+          title: g.name,
+          content: makePin(i + 1, false)
+        });
+        marker.addListener('click', function () { selectGlacier(i); });
+        markers[i] = marker;
+      }
+    }
+
+    function onMapsError() {
+      document.getElementById('map-fallback').style.display = 'flex';
+    }
+
+    // Chargement dynamique de l'API Google Maps
+    (function loadMaps() {
+      buildList();
+      const s = document.createElement('script');
+      s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GOOGLE_MAPS_API_KEY +
+              '&libraries=places,marker&v=weekly&loading=async&callback=initMap';
+      s.async = true;
+      s.onerror = onMapsError;
+      window.gm_authFailure = onMapsError;
+      window.initMap = initMap;
+      document.head.appendChild(s);
+    })();
+  </script>
 </body>
 </html>
