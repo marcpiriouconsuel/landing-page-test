@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Les meilleurs bars de Saint-Sébastien (Donostia)">
+  <title>Les meilleurs bars de Saint-Sébastien</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>">
+  <style>
+    :root {
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --accent: #2e5bba;
+      --accent-soft: #dce6ff;
+      --text: #1e2640;
+      --muted: #6b7494;
+      --star: #f5a623;
+      --shadow: 0 6px 24px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header.app-header {
+      padding: 1.4rem 1.6rem;
+      background: linear-gradient(135deg, #2e5bba, #1a9e8f);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    header.app-header h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    header.app-header p {
+      margin: .35rem 0 0;
+      opacity: .92;
+      font-size: .95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 440px) 1fr;
+      height: calc(100vh - 92px);
+    }
+
+    .list-pane {
+      overflow-y: auto;
+      padding: 1.1rem;
+    }
+    .bar-card {
+      display: flex;
+      gap: .9rem;
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: .8rem;
+      margin-bottom: .9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+    .bar-card:hover { transform: translateY(-2px); }
+    .bar-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 8px 28px rgba(46,91,186,0.25);
+    }
+    .bar-photo {
+      width: 104px;
+      height: 104px;
+      flex: 0 0 104px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%232e5bba' stroke-width='1.5'%3E%3Cpath d='M17 11h1a3 3 0 0 1 0 6h-1'/%3E%3Cpath d='M9 12v6'/%3E%3Cpath d='M13 12v6'/%3E%3Cpath d='M14 7H6v5h8'/%3E%3Cpath d='M6 7V4'/%3E%3C/svg%3E") center/40px no-repeat;
+    }
+    .bar-body { min-width: 0; flex: 1; }
+    .bar-name {
+      margin: 0 0 .2rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .bar-type {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: .1rem .55rem;
+      margin-bottom: .3rem;
+    }
+    .bar-rating {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+    .stars { color: var(--star); letter-spacing: 1px; }
+    .bar-summary {
+      margin: 0;
+      font-size: .85rem;
+      line-height: 1.4;
+      color: #4a5270;
+    }
+    .bar-addr {
+      margin: .4rem 0 0;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .map-pane { position: relative; }
+    #map { width: 100%; height: 100%; }
+    #map-fallback {
+      display: none;
+      position: absolute;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      background: var(--accent-soft);
+    }
+
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .map-pane { height: 60vh; order: -1; }
+      .list-pane { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <h1>🍺 Les meilleurs bars de Saint-Sébastien</h1>
+    <p>Donostia, Pays basque espagnol — cliquez sur un bar pour le situer sur la carte.</p>
+  </header>
+
+  <div class="layout">
+    <section class="list-pane" id="list-pane" aria-label="Liste des bars"></section>
+    <section class="map-pane">
+      <div id="map"></div>
+      <div id="map-fallback">
+        <div>
+          <p><strong>La carte n'a pas pu se charger.</strong></p>
+          <p>Vérifiez que la clé API Google Maps est valide et que « Maps JavaScript API » et « Places API (New) » sont activées.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    'use strict';
+
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyCV5hzm_XpjdPismhstPTUZdhFxmwXCsPY';
+    const CITY_CENTER = { lat: 43.3193, lng: -1.9815 };
+
+    const BARS = [
+      {
+        name: 'Borda Berri',
+        type: 'Bar à pintxos chauds',
+        query: 'Borda Berri, Fermín Calbetón, Donostia',
+        fallback: { lat: 43.3185, lng: -1.9821 },
+        address: 'Fermín Calbetón Kalea, 12',
+        summary: "Temple des pintxos chauds préparés à la commande, régulièrement classé parmi les meilleurs de la ville. Le riz bomba aux crevettes, le risotto à l'Idiazabal et les côtes de veau fondantes sont légendaires. Atmosphère vibrante et service passionné."
+      },
+      {
+        name: 'La Cuchara de San Telmo',
+        type: 'Bar à pintxos modernes',
+        query: 'La Cuchara de San Telmo, Donostia',
+        fallback: { lat: 43.3177, lng: -1.9805 },
+        address: 'Calle 31 de Agosto, 28',
+        summary: "Pionnier du pintxo chaud et créatif, avec plus de 10 000 avis élogieux. Les cannelloni maison et le foie gras à la compote de pommes sont devenus des classiques de la Vieille Ville. Attendez-vous à faire la queue — ça en vaut la peine."
+      },
+      {
+        name: 'Ganbara',
+        type: 'Bar à pintxos gastronomique',
+        query: 'Ganbara bar pintxos, San Jerónimo, Donostia',
+        fallback: { lat: 43.3188, lng: -1.9825 },
+        address: 'C. de San Jerónimo, 21',
+        summary: "Institution gastronomique depuis 1984, sélectionnée par le Guide Michelin. Célèbre pour ses champignons sautés à la perfection et son txangurro (crabe farci à la donostiarra). L'équilibre parfait entre bar décontracté et cuisine d'exception."
+      },
+      {
+        name: 'La Gintonería Donostiarra',
+        type: 'Bar à gin & tonic',
+        query: 'La Gintonería Donostiarra, Zabaleta, Donostia',
+        fallback: { lat: 43.3225, lng: -1.9855 },
+        address: 'Calle Zabaleta, 6 (Gros)',
+        summary: "Classé n°1 des bars nocturnes sur TripAdvisor, avec plus de 150 références de gin. Les mixologues créent des cocktails dans de grandes coupes avec des glaçons taillés et des toniques botaniques choisis. Une expérience sensorielle unique à Donostia."
+      },
+      {
+        name: 'Mala Gissona',
+        type: 'Brasserie artisanale',
+        query: 'Mala Gissona, Zabaleta, Donostia',
+        fallback: { lat: 43.3230, lng: -1.9850 },
+        address: 'Zabaleta Kalea, 53 (Gros)',
+        summary: "Microbrasserie au cadre épuré et industriel, brassant ses propres bières sur place. Sélection limitée mais excellente couvrant tous les styles, accompagnée de burgers maison et de bouteilles internationales soigneusement sélectionnées."
+      },
+      {
+        name: 'Bar Etxeberria',
+        type: 'Bar à bières & vermut',
+        query: 'Bar Etxeberria, Calle Iñigo, Donostia',
+        fallback: { lat: 43.3198, lng: -1.9810 },
+        address: 'Calle Iñigo, 8',
+        summary: "Une institution familiale en plein cœur de la Vieille Ville, avec poutres apparentes et une impressionnante sélection de bières artisanales locales et internationales. Le vermut maison du week-end est incontournable — lieu de rencontre apprécié des locaux."
+      },
+      {
+        name: 'Sirimiri',
+        type: 'Bar à cocktails & pintxos',
+        query: 'Sirimiri bar, Calle Mayor, Donostia',
+        fallback: { lat: 43.3202, lng: -1.9808 },
+        address: 'C. Mayor, 4',
+        summary: "Cocktail lounge cosy aux poutres de bois, niché près de l'église Santa María. La carte compte une cinquantaine de cocktails, dont beaucoup à base de vermouth. Les pintxos fusion — beignets de calmar, petits pains de porc — transcendent la tradition."
+      },
+      {
+        name: 'Bar Desy',
+        type: 'Bar à bières artisanales',
+        query: 'Bar Desy, Ronda Kalea, Donostia',
+        fallback: { lat: 43.3210, lng: -1.9870 },
+        address: 'Ronda Kalea, 4 (Gros)',
+        summary: "Pépite locale fondée par Gorka et Jose Maria, passionnés qui connaissent chaque bière de leur cave. La txuleta burger maison est tendre et généreuse. La collection inclut des raretés comme Cantillon et 3 Fonteinen — un sanctuaire pour les amateurs de bière."
+      }
+    ];
+
+    let map, infoWindow;
+    const cardEls = [];
+    const markers = [];
+    let activeIndex = -1;
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str == null ? '' : String(str)));
+      return div.innerHTML;
+    }
+
+    function starString(rating) {
+      if (!rating) return '';
+      const full = Math.round(rating);
+      return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5 - full);
+    }
+
+    function buildList() {
+      const pane = document.getElementById('list-pane');
+      BARS.forEach(function (b, i) {
+        const card = document.createElement('article');
+        card.className = 'bar-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.innerHTML =
+          '<img class="bar-photo" alt="' + escapeHTML(b.name) + '">' +
+          '<div class="bar-body">' +
+            '<h2 class="bar-name">' + escapeHTML(b.name) + '</h2>' +
+            '<span class="bar-type">' + escapeHTML(b.type) + '</span>' +
+            '<div class="bar-rating" data-role="rating">Chargement des avis…</div>' +
+            '<p class="bar-summary">' + escapeHTML(b.summary) + '</p>' +
+            '<p class="bar-addr">📍 ' + escapeHTML(b.address) + '</p>' +
+          '</div>';
+        card.addEventListener('click', function () { selectBar(i); });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectBar(i); }
+        });
+        pane.appendChild(card);
+        cardEls[i] = card;
+      });
+    }
+
+    function selectBar(i) {
+      const marker = markers[i];
+      if (!marker || !map) return;
+
+      if (activeIndex >= 0 && cardEls[activeIndex]) {
+        cardEls[activeIndex].classList.remove('active');
+      }
+      activeIndex = i;
+      cardEls[i].classList.add('active');
+
+      map.panTo(marker.position);
+      map.setZoom(17);
+
+      markers.forEach(function (m, idx) {
+        if (!m) return;
+        m.content = makePin(idx + 1, idx === i);
+        m.zIndex = idx === i ? 999 : 1;
+      });
+
+      const b = BARS[i];
+      const ratingTxt = b._rating
+        ? '<div style="color:#f5a623">' + starString(b._rating) + ' ' + b._rating.toFixed(1) +
+          ' <span style="color:#888">(' + (b._count || 0) + ' avis)</span></div>'
+        : '';
+      infoWindow.setContent(
+        '<div style="font-family:sans-serif;max-width:220px">' +
+          '<strong style="font-size:1rem">' + escapeHTML(b.name) + '</strong>' +
+          '<div style="font-size:.75rem;color:#2e5bba;margin:2px 0">' + escapeHTML(b.type) + '</div>' +
+          ratingTxt +
+          '<div style="font-size:.8rem;color:#666;margin-top:2px">📍 ' + escapeHTML(b.address) + '</div>' +
+        '</div>'
+      );
+      infoWindow.open({ map: map, anchor: marker });
+      cardEls[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function makePin(label, active) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText =
+        'font:700 13px sans-serif;color:#fff;' +
+        'width:' + (active ? 36 : 28) + 'px;height:' + (active ? 36 : 28) + 'px;' +
+        'display:flex;align-items:center;justify-content:center;border-radius:50% 50% 50% 0;' +
+        'background:' + (active ? '#2e5bba' : '#1a9e8f') + ';' +
+        'box-shadow:0 2px 6px rgba(0,0,0,.4);border:2px solid #fff;' +
+        'transform:rotate(-45deg) scale(' + (active ? 1.05 : 1) + ');';
+      const inner = document.createElement('span');
+      inner.textContent = label;
+      inner.style.transform = 'rotate(45deg)';
+      wrap.appendChild(inner);
+      return wrap;
+    }
+
+    async function initMap() {
+      const { Map, InfoWindow } = await google.maps.importLibrary('maps');
+      const { Place } = await google.maps.importLibrary('places');
+      const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+
+      map = new Map(document.getElementById('map'), {
+        center: CITY_CENTER,
+        zoom: 15,
+        mapId: 'BARS_DONOSTIA_MAP',
+        mapTypeControl: false,
+        streetViewControl: false,
+        gestureHandling: 'greedy'
+      });
+      infoWindow = new InfoWindow();
+
+      for (let i = 0; i < BARS.length; i++) {
+        const b = BARS[i];
+        let position = b.fallback;
+        let photoUri = null;
+
+        try {
+          const res = await Place.searchByText({
+            textQuery: b.query,
+            fields: ['displayName', 'location', 'photos', 'rating', 'userRatingCount'],
+            maxResultCount: 1,
+            locationBias: CITY_CENTER
+          });
+          const place = res.places && res.places[0];
+          if (place) {
+            if (place.location) {
+              position = { lat: place.location.lat(), lng: place.location.lng() };
+            }
+            if (place.rating) {
+              b._rating = place.rating;
+              b._count = place.userRatingCount || 0;
+            }
+            if (place.photos && place.photos.length) {
+              photoUri = place.photos[0].getURI({ maxWidth: 320, maxHeight: 320 });
+            }
+          }
+        } catch (e) { /* garde le fallback */ }
+
+        const card = cardEls[i];
+        if (photoUri) card.querySelector('.bar-photo').src = photoUri;
+        const ratingEl = card.querySelector('[data-role="rating"]');
+        if (b._rating) {
+          ratingEl.innerHTML =
+            '<span class="stars">' + starString(b._rating) + '</span>' +
+            '<span>' + b._rating.toFixed(1) + ' · ' + b._count + ' avis</span>';
+        } else {
+          ratingEl.textContent = 'Note non disponible';
+        }
+
+        const marker = new AdvancedMarkerElement({
+          map: map,
+          position: position,
+          title: b.name,
+          content: makePin(i + 1, false)
+        });
+        marker.addListener('click', function () { selectBar(i); });
+        markers[i] = marker;
+      }
+    }
+
+    function onMapsError() {
+      document.getElementById('map-fallback').style.display = 'flex';
+    }
+
+    (function loadMaps() {
+      buildList();
+      const s = document.createElement('script');
+      s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GOOGLE_MAPS_API_KEY +
+              '&libraries=places,marker&v=weekly&loading=async&callback=initMap';
+      s.async = true;
+      s.onerror = onMapsError;
+      window.gm_authFailure = onMapsError;
+      window.initMap = initMap;
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
