@@ -145,7 +145,7 @@
 <body>
   <header class="app-header">
     <h1>🍺 Les meilleurs bars de Saint-Sébastien</h1>
-    <p>Donostia, Pays basque espagnol — cliquez sur un bar pour le situer sur la carte.</p>
+    <p>Autour de la Plaza de Zaragoza, Donostia — cliquez sur un bar pour le situer sur la carte.</p>
   </header>
 
   <div class="layout">
@@ -165,24 +165,32 @@
     'use strict';
 
     const GOOGLE_MAPS_API_KEY = 'AIzaSyCV5hzm_XpjdPismhstPTUZdhFxmwXCsPY';
-    const CITY_CENTER = { lat: 43.3193, lng: -1.9815 };
+    const CITY_CENTER = { lat: 43.3215, lng: -1.9830 }; // Plaza de Zaragoza
 
     const BARS = [
+      {
+        name: 'Antonio Bar',
+        type: 'Bar à pintxos',
+        query: 'Antonio Bar, Calle Bergara, Donostia',
+        fallback: { lat: 43.3197, lng: -1.9805 },
+        address: 'Calle Bergara, 3',
+        summary: "Célèbre pour sa tortilla de patatas préparée avec 28 œufs, considérée comme l'une des meilleures de la ville. Les pintxos maison — anchois, croquettes et raviolis à la sauce Martini — sont exemplaires. Service impeccable dès l'ouverture à 7h30, très apprécié des locaux."
+      },
+      {
+        name: 'Bar Sport',
+        type: 'Bar à pintxos chauds',
+        query: 'Bar Sport pintxos, Fermín Calbetón, Donostia',
+        fallback: { lat: 43.3186, lng: -1.9822 },
+        address: 'Fermín Calbetón Kalea, 10',
+        summary: "L'un des bars les plus populaires de la Parte Vieja, noté parmi les 10 meilleurs de la ville. Célèbre pour son foie gras grillé sur toast croustillant et sa tortilla aux fruits de mer. Ingrédients frais garantis et un soin particulier apporté à chaque pintxo."
+      },
       {
         name: 'Borda Berri',
         type: 'Bar à pintxos chauds',
         query: 'Borda Berri, Fermín Calbetón, Donostia',
         fallback: { lat: 43.3185, lng: -1.9821 },
         address: 'Fermín Calbetón Kalea, 12',
-        summary: "Temple des pintxos chauds préparés à la commande, régulièrement classé parmi les meilleurs de la ville. Le riz bomba aux crevettes, le risotto à l'Idiazabal et les côtes de veau fondantes sont légendaires. Atmosphère vibrante et service passionné."
-      },
-      {
-        name: 'La Cuchara de San Telmo',
-        type: 'Bar à pintxos modernes',
-        query: 'La Cuchara de San Telmo, Donostia',
-        fallback: { lat: 43.3177, lng: -1.9805 },
-        address: 'Calle 31 de Agosto, 28',
-        summary: "Pionnier du pintxo chaud et créatif, avec plus de 10 000 avis élogieux. Les cannelloni maison et le foie gras à la compote de pommes sont devenus des classiques de la Vieille Ville. Attendez-vous à faire la queue — ça en vaut la peine."
+        summary: "Temple des pintxos chauds préparés à la commande, régulièrement classé dans le top 20 de la ville. Les joues de bœuf braisées au vin rouge et les oreilles de porc tendres et croustillantes sont légendaires. Atmosphère vibrante et service passionné."
       },
       {
         name: 'Ganbara',
@@ -193,44 +201,36 @@
         summary: "Institution gastronomique depuis 1984, sélectionnée par le Guide Michelin. Célèbre pour ses champignons sautés à la perfection et son txangurro (crabe farci à la donostiarra). L'équilibre parfait entre bar décontracté et cuisine d'exception."
       },
       {
-        name: 'La Gintonería Donostiarra',
-        type: 'Bar à gin & tonic',
-        query: 'La Gintonería Donostiarra, Zabaleta, Donostia',
-        fallback: { lat: 43.3225, lng: -1.9855 },
-        address: 'Calle Zabaleta, 6 (Gros)',
-        summary: "Classé n°1 des bars nocturnes sur TripAdvisor, avec plus de 150 références de gin. Les mixologues créent des cocktails dans de grandes coupes avec des glaçons taillés et des toniques botaniques choisis. Une expérience sensorielle unique à Donostia."
+        name: 'Txepetxa',
+        type: 'Bar à anchois',
+        query: 'Bar Txepetxa, Calle Pescadería, Donostia',
+        fallback: { lat: 43.3190, lng: -1.9835 },
+        address: 'Calle Pescadería, 5',
+        summary: "Institution centenaire et lauréate du « Meilleur pintxo 2022 », entièrement dédiée à l'anchois (bocarte). Depuis 1972, trois générations de la même famille proposent des combinaisons surprenantes sur pain grillé avec un vinaigre blanc maison. Une référence absolue de la culture pintxos."
       },
       {
-        name: 'Mala Gissona',
-        type: 'Brasserie artisanale',
-        query: 'Mala Gissona, Zabaleta, Donostia',
-        fallback: { lat: 43.3230, lng: -1.9850 },
-        address: 'Zabaleta Kalea, 53 (Gros)',
-        summary: "Microbrasserie au cadre épuré et industriel, brassant ses propres bières sur place. Sélection limitée mais excellente couvrant tous les styles, accompagnée de burgers maison et de bouteilles internationales soigneusement sélectionnées."
+        name: 'Bar Martínez',
+        type: 'Bar à pintxos chauds',
+        query: 'Bar Martínez, Calle 31 de Agosto, Donostia',
+        fallback: { lat: 43.3182, lng: -1.9828 },
+        address: 'Calle 31 de Agosto, 13',
+        summary: "Depuis 1942, un comptoir de neuf mètres débordant de pintxos soignés. Poivrons rouges farcis au thon, brochette de poulpe et charlota au crabe sont les signatures. Classé parmi les 400 meilleurs restaurants d'Europe par Opinionated About Dining."
       },
       {
-        name: 'Bar Etxeberria',
-        type: 'Bar à bières & vermut',
-        query: 'Bar Etxeberria, Calle Iñigo, Donostia',
-        fallback: { lat: 43.3198, lng: -1.9810 },
-        address: 'Calle Iñigo, 8',
-        summary: "Une institution familiale en plein cœur de la Vieille Ville, avec poutres apparentes et une impressionnante sélection de bières artisanales locales et internationales. Le vermut maison du week-end est incontournable — lieu de rencontre apprécié des locaux."
+        name: 'La Cuchara de San Telmo',
+        type: 'Bar à pintxos modernes',
+        query: 'La Cuchara de San Telmo, Donostia',
+        fallback: { lat: 43.3177, lng: -1.9805 },
+        address: 'Calle 31 de Agosto, 28',
+        summary: "Pionnier du pintxo chaud et créatif, avec plus de 10 000 avis élogieux. Les cannelloni maison et le foie gras à la compote de pommes sont devenus des classiques. Attendez-vous à faire la queue — ça en vaut chaque minute."
       },
       {
-        name: 'Sirimiri',
-        type: 'Bar à cocktails & pintxos',
-        query: 'Sirimiri bar, Calle Mayor, Donostia',
-        fallback: { lat: 43.3202, lng: -1.9808 },
-        address: 'C. Mayor, 4',
-        summary: "Cocktail lounge cosy aux poutres de bois, niché près de l'église Santa María. La carte compte une cinquantaine de cocktails, dont beaucoup à base de vermouth. Les pintxos fusion — beignets de calmar, petits pains de porc — transcendent la tradition."
-      },
-      {
-        name: 'Bar Desy',
-        type: 'Bar à bières artisanales',
-        query: 'Bar Desy, Ronda Kalea, Donostia',
-        fallback: { lat: 43.3210, lng: -1.9870 },
-        address: 'Ronda Kalea, 4 (Gros)',
-        summary: "Pépite locale fondée par Gorka et Jose Maria, passionnés qui connaissent chaque bière de leur cave. La txuleta burger maison est tendre et généreuse. La collection inclut des raretés comme Cantillon et 3 Fonteinen — un sanctuaire pour les amateurs de bière."
+        name: 'Zazpi',
+        type: 'Bar à pintxos haute cuisine',
+        query: 'Zazpi taberna, Calle San Marcial, Donostia',
+        fallback: { lat: 43.3218, lng: -1.9836 },
+        address: 'Calle San Marcial, 7',
+        summary: "Zazpi (« sept » en basque) propose de la haute cuisine en format pintxo, dans une rue piétonne à deux pas de la Plaza de Zaragoza. Pintxos innovants et créatifs, apprécié autant des travailleurs locaux que des visiteurs qui fuient la Vieille Ville surpeuplée."
       }
     ];
 
