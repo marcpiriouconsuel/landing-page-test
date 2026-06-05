@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tous les événements à Toulouse et dans les villes à moins de 20 km : concerts, festivals, sport, expos, gastronomie…">
+  <title>Événements à Toulouse et alentours</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎫</text></svg>">
+  <style>
+    :root {
+      --bg: #f8f7fa;
+      --card: #ffffff;
+      --accent: #d1410c;          /* orange Eventbrite */
+      --accent-2: #f05537;
+      --accent-soft: #ffe6dd;
+      --ink: #1e0a3c;             /* violet foncé Eventbrite */
+      --text: #39364f;
+      --muted: #6f7287;
+      --line: #eeedf2;
+      --star: #f5a623;
+      --shadow: 0 4px 20px rgba(30,10,60,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a { color: inherit; }
+
+    header.app-header {
+      padding: 2.2rem 1.6rem 2.4rem;
+      background: linear-gradient(135deg, #1e0a3c 0%, #6a1b9a 55%, #d1410c 130%);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    .header-inner { max-width: 1200px; margin: 0 auto; }
+    header.app-header h1 {
+      margin: 0;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+    header.app-header p {
+      margin: .5rem 0 0;
+      opacity: .92;
+      font-size: 1.02rem;
+      max-width: 640px;
+    }
+
+    /* Barre de filtres */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .toolbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: .9rem 1.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .9rem;
+      align-items: center;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      flex: 1;
+      min-width: 0;
+    }
+    .chip {
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: .42rem .9rem;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--accent-2); color: var(--accent); }
+    .chip.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: .42rem .9rem;
+      min-width: 220px;
+    }
+    .search-box input {
+      border: 0;
+      outline: 0;
+      font-size: .9rem;
+      width: 100%;
+      background: transparent;
+      color: var(--text);
+    }
+    .result-count {
+      font-size: .85rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Layout principal : grille d'événements + carte */
+    .layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.6rem;
+      display: grid;
+      grid-template-columns: 1fr minmax(320px, 420px);
+      gap: 1.6rem;
+      align-items: start;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .event-card {
+      background: var(--card);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .event-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(30,10,60,0.14); }
+    .event-card.active { border-color: var(--accent); }
+    .event-card.hidden { display: none; }
+
+    .event-photo {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23d1410c' stroke-width='1.4'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E") center/48px no-repeat;
+      display: block;
+    }
+    .photo-wrap { position: relative; }
+    .date-badge {
+      position: absolute;
+      top: .7rem;
+      left: .7rem;
+      background: #fff;
+      border-radius: 10px;
+      padding: .3rem .55rem;
+      text-align: center;
+      line-height: 1;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .date-badge .day { font-size: 1.15rem; font-weight: 800; color: var(--ink); }
+    .date-badge .mon { font-size: .65rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; }
+    .cat-tag {
+      position: absolute;
+      bottom: .7rem;
+      left: .7rem;
+      background: rgba(30,10,60,.82);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: .22rem .6rem;
+      border-radius: 999px;
+      backdrop-filter: blur(2px);
+    }
+
+    .event-body { padding: .9rem 1rem 1rem; display: flex; flex-direction: column; flex: 1; }
+    .event-title {
+      margin: 0 0 .35rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .event-meta { margin: 0 0 .15rem; font-size: .82rem; color: var(--accent); font-weight: 600; }
+    .event-venue { margin: .15rem 0; font-size: .82rem; color: var(--muted); }
+    .event-desc {
+      margin: .5rem 0 .7rem;
+      font-size: .82rem;
+      line-height: 1.45;
+      color: #5a5870;
+      flex: 1;
+    }
+    .event-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      margin-top: auto;
+    }
+    .event-price { font-weight: 800; color: var(--ink); font-size: .95rem; }
+    .event-price.free { color: #1a8a4a; }
+    .btn-book {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: .82rem;
+      padding: .5rem .9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .btn-book:hover { background: #b53609; }
+    .rating-line {
+      display: flex; align-items: center; gap: .3rem;
+      font-size: .78rem; color: var(--muted); margin-top: .35rem;
+    }
+    .stars { color: var(--star); letter-spacing: 1px; }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--muted);
+      padding: 3rem 1rem;
+    }
+
+    /* Carte */
+    .map-pane {
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 96px);
+      min-height: 420px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: var(--card);
+    }
+    #map { width: 100%; height: 100%; }
+    #map-fallback {
+      display: none;
+      position: absolute;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      background: var(--accent-soft);
+    }
+
+    footer.app-footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.6rem 2.5rem;
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .map-pane { position: relative; top: 0; height: 55vh; order: -1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <h1>🎫 Événements à Toulouse &amp; alentours</h1>
+      <p>Concerts, festivals, sport, expos, gastronomie… Tout ce qui se passe à Toulouse et dans les communes à moins de 20 km. Cliquez sur un événement pour le situer sur la carte.</p>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="filters" id="filters" aria-label="Filtrer par catégorie"></div>
+      <div class="search-box">
+        <span aria-hidden="true">🔎</span>
+        <input id="search" type="search" placeholder="Rechercher un événement, un lieu, une ville…" aria-label="Rechercher">
+      </div>
+      <span class="result-count" id="result-count"></span>
+    </div>
+  </div>
+
+  <main class="layout">
+    <section class="events-grid" id="events-grid" aria-label="Liste des événements"></section>
+    <aside class="map-pane">
+      <div id="map"></div>
+      <div id="map-fallback">
+        <div>
+          <p><strong>La carte n'a pas pu se charger.</strong></p>
+          <p>Vérifiez que la clé API Google Maps est valide et que « Maps JavaScript API » et « Places API (New) » sont activées.</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    Sélection d'événements à titre indicatif (Toulouse et communes situées à moins de 20 km : Blagnac, Ramonville, Tournefeuille, Colomiers, Balma, Labège, Aussonne, Cugnaux…). Page d'inspiration de type Eventbrite — vérifiez toujours les dates et la billetterie auprès de l'organisateur.
+  </footer>
+
+  <script>
+    'use strict';
+
+    // ⚠️ Clé restreinte par référent HTTP à marcpiriouconsuel.github.io/*
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyCV5hzm_XpjdPismhstPTUZdhFxmwXCsPY';
+
+    // Centre de Toulouse
+    const CITY_CENTER = { lat: 43.6045, lng: 1.4440 };
+
+    // Catégories (clé => libellé avec emoji)
+    const CATEGORIES = [
+      { key: 'all',     label: 'Tout' },
+      { key: 'musique', label: '🎵 Musique' },
+      { key: 'festival',label: '🎉 Festival' },
+      { key: 'sport',   label: '⚽ Sport' },
+      { key: 'spectacle',label: '🎭 Spectacle' },
+      { key: 'expo',    label: '🎨 Art & Expo' },
+      { key: 'gastro',  label: '🍷 Gastronomie' },
+      { key: 'famille', label: '👨‍👩‍👧 Famille' }
+    ];
+
+    // Événements (données indicatives ; lieu/photo/note enrichis en direct via Places).
+    // dateISO sert au tri et au badge de date ; "ville" indique Toulouse ou une commune à <20 km.
+    const EVENTS = [
+      {
+        title: "Festival Rio Loco — Musiques du monde",
+        category: 'festival',
+        dateISO: '2026-06-17',
+        timeLabel: '17 → 21 juin · à partir de 18h',
+        venue: 'Prairie des Filtres',
+        city: 'Toulouse',
+        price: 'À partir de 12 €',
+        free: false,
+        desc: "Le grand festival des musiques du monde au bord de la Garonne. Cette édition met à l'honneur les cultures méditerranéennes : concerts, danses et stands de cuisine du monde.",
+        query: 'Prairie des Filtres, Toulouse',
+        fallback: { lat: 43.5957, lng: 1.4361 }
+      },
+      {
+        title: "Concert événement au Zénith de Toulouse",
+        category: 'musique',
+        dateISO: '2026-06-20',
+        timeLabel: '20 juin · 20h30',
+        venue: 'Zénith de Toulouse Métropole',
+        city: 'Toulouse',
+        price: 'À partir de 45 €',
+        free: false,
+        desc: "Une tête d'affiche de la scène française en tournée. Fosse et gradins, ouverture des portes à 19h. Pensez à arriver tôt, affluence importante prévue.",
+        query: 'Zénith de Toulouse Métropole',
+        fallback: { lat: 43.5949, lng: 1.4842 }
+      },
+      {
+        title: "Soirée live au Bikini",
+        category: 'musique',
+        dateISO: '2026-06-12',
+        timeLabel: '12 juin · 20h00',
+        venue: 'Le Bikini',
+        city: 'Ramonville-Saint-Agne',
+        price: '24 €',
+        free: false,
+        desc: "La salle culte de l'agglomération toulousaine accueille une soirée électro / rock. Bar, terrasse et programmation pointue à deux pas de la station de métro Ramonville.",
+        query: 'Le Bikini, Ramonville-Saint-Agne',
+        fallback: { lat: 43.5469, lng: 1.4894 }
+      },
+      {
+        title: "Orchestre National du Capitole",
+        category: 'spectacle',
+        dateISO: '2026-06-13',
+        timeLabel: '13 juin · 20h00',
+        venue: 'Halle aux Grains',
+        city: 'Toulouse',
+        price: 'À partir de 18 €',
+        free: false,
+        desc: "Soirée symphonique dans l'acoustique exceptionnelle de la Halle aux Grains. Au programme : un grand classique du répertoire romantique, sous la direction de son chef titulaire.",
+        query: 'Halle aux Grains, Toulouse',
+        fallback: { lat: 43.5990, lng: 1.4503 }
+      },
+      {
+        title: "Stade Toulousain — Match au sommet",
+        category: 'sport',
+        dateISO: '2026-06-06',
+        timeLabel: '6 juin · 21h05',
+        venue: 'Stade Ernest-Wallon',
+        city: 'Toulouse',
+        price: 'À partir de 30 €',
+        free: false,
+        desc: "Affiche bouillante de fin de saison de Top 14. Ambiance garantie dans le temple du rugby toulousain. Buvettes et boutique ouvertes 2h avant le coup d'envoi.",
+        query: 'Stade Ernest-Wallon, Toulouse',
+        fallback: { lat: 43.6243, lng: 1.4036 }
+      },
+      {
+        title: "Cité de l'espace — Nocturne aux étoiles",
+        category: 'famille',
+        dateISO: '2026-06-21',
+        timeLabel: '21 juin · 18h → minuit',
+        venue: "Cité de l'espace",
+        city: 'Toulouse',
+        price: 'Adulte 26 € · Enfant 19 €',
+        free: false,
+        desc: "Visite nocturne du parc avec observation du ciel, séances de planétarium et animations pour toute la famille. Fusée Ariane 5 illuminée et food-trucks sur place.",
+        query: "Cité de l'espace, Toulouse",
+        fallback: { lat: 43.5861, lng: 1.4953 }
+      },
+      {
+        title: "Marché gourmand nocturne",
+        category: 'gastro',
+        dateISO: '2026-06-19',
+        timeLabel: '19 juin · 18h → 23h',
+        venue: 'Place de la Mairie',
+        city: 'Tournefeuille',
+        price: 'Entrée libre',
+        free: true,
+        desc: "Producteurs locaux, food-trucks et animations musicales en plein air. Tables installées sur la place : achetez, attablez-vous et dégustez. Convivial et familial.",
+        query: 'Place de la Mairie, Tournefeuille',
+        fallback: { lat: 43.5847, lng: 1.3447 }
+      },
+      {
+        title: "Aeroscopia — Visite des avions de légende",
+        category: 'famille',
+        dateISO: '2026-06-07',
+        timeLabel: 'Tous les jours · 9h30 → 18h',
+        venue: "Musée Aeroscopia",
+        city: 'Blagnac',
+        price: 'Adulte 15,50 € · Enfant 11 €',
+        free: false,
+        desc: "Plongez sous les ailes du Concorde, de l'A300B et du Super Guppy. Un musée spectaculaire au cœur du berceau aéronautique européen, à 10 min du centre de Toulouse.",
+        query: 'Aeroscopia, Blagnac',
+        fallback: { lat: 43.6306, lng: 1.3672 }
+      },
+      {
+        title: "Festival des Arts de Rue",
+        category: 'festival',
+        dateISO: '2026-06-14',
+        timeLabel: '14 juin · 11h → 22h',
+        venue: 'Centre-ville',
+        city: 'Colomiers',
+        price: 'Entrée libre',
+        free: true,
+        desc: "Théâtre, cirque, fanfares et installations déambulent dans toute la ville. Spectacles gratuits en continu et grand final pyrotechnique en soirée.",
+        query: 'Hôtel de Ville, Colomiers',
+        fallback: { lat: 43.6113, lng: 1.3340 }
+      },
+      {
+        title: "Exposition d'art contemporain",
+        category: 'expo',
+        dateISO: '2026-06-10',
+        timeLabel: "Jusqu'au 30 juin · 10h → 18h",
+        venue: 'Les Abattoirs',
+        city: 'Toulouse',
+        price: '8 € · gratuit -18 ans',
+        free: false,
+        desc: "Le musée d'art moderne et contemporain de Toulouse présente une exposition temporaire d'envergure mêlant peinture, vidéo et installations immersives.",
+        query: 'Les Abattoirs, Toulouse',
+        fallback: { lat: 43.5959, lng: 1.4256 }
+      },
+      {
+        title: "Spectacle humour au Phare",
+        category: 'spectacle',
+        dateISO: '2026-06-18',
+        timeLabel: '18 juin · 20h30',
+        venue: 'Salle Le Phare',
+        city: 'Tournefeuille',
+        price: '22 €',
+        free: false,
+        desc: "Un one-man-show désopilant dans l'une des salles les plus dynamiques de l'agglomération. Réservation conseillée, jauge limitée.",
+        query: 'Le Phare, Tournefeuille',
+        fallback: { lat: 43.5739, lng: 1.3503 }
+      },
+      {
+        title: "Salon du Vin & des Saveurs",
+        category: 'gastro',
+        dateISO: '2026-06-27',
+        timeLabel: '27 → 28 juin · 10h → 19h',
+        venue: 'MEETT — Parc des Expositions',
+        city: 'Aussonne',
+        price: '6 € (verre offert)',
+        free: false,
+        desc: "Des centaines de vignerons et artisans du goût réunis sous une même halle. Dégustations, ateliers accords mets-vins et vente directe. Navettes depuis Toulouse.",
+        query: 'MEETT Toulouse, Aussonne',
+        fallback: { lat: 43.6664, lng: 1.3736 }
+      },
+      {
+        title: "Festival Électro en plein air",
+        category: 'festival',
+        dateISO: '2026-06-26',
+        timeLabel: '26 juin · 16h → 02h',
+        venue: 'Parc de la Maourine',
+        city: 'Toulouse',
+        price: 'À partir de 28 €',
+        free: false,
+        desc: "Une journée de DJ sets en plein air dans un cadre verdoyant au nord de Toulouse. Scènes multiples, espace détente et stands de street-food.",
+        query: 'Jardin botanique de la Maourine, Toulouse',
+        fallback: { lat: 43.6498, lng: 1.4593 }
+      },
+      {
+        title: "Brocante & vide-greniers géant",
+        category: 'famille',
+        dateISO: '2026-06-21',
+        timeLabel: '21 juin · 7h → 18h',
+        venue: 'Centre-ville',
+        city: 'Balma',
+        price: 'Entrée libre',
+        free: true,
+        desc: "Plus de 300 exposants pour chiner objets vintage, vinyles et trouvailles en tout genre. Buvette et restauration sur place, ambiance familiale.",
+        query: 'Mairie de Balma',
+        fallback: { lat: 43.6097, lng: 1.4994 }
+      }
+    ];
+
+    const MONTHS_ABBR = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛ','SEP','OCT','NOV','DÉC'];
+
+    let map, infoWindow;
+    let activeCategory = 'all';
+    let searchTerm = '';
+    const cardEls = [];   // éléments DOM par index
+    const markers = [];   // marqueurs par index
+    let activeIndex = -1;
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str == null ? '' : String(str)));
+      return div.innerHTML;
+    }
+
+    function starString(rating) {
+      if (!rating) return '';
+      const full = Math.round(rating);
+      return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5 - full);
+    }
+
+    function catLabel(key) {
+      const c = CATEGORIES.find(function (x) { return x.key === key; });
+      return c ? c.label : key;
+    }
+
+    // Tri chronologique
+    EVENTS.sort(function (a, b) { return a.dateISO < b.dateISO ? -1 : a.dateISO > b.dateISO ? 1 : 0; });
+
+    function buildFilters() {
+      const wrap = document.getElementById('filters');
+      CATEGORIES.forEach(function (c) {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (c.key === 'all' ? ' active' : '');
+        btn.textContent = c.label;
+        btn.dataset.key = c.key;
+        btn.addEventListener('click', function () {
+          activeCategory = c.key;
+          document.querySelectorAll('.chip').forEach(function (el) { el.classList.remove('active'); });
+          btn.classList.add('active');
+          applyFilters();
+        });
+        wrap.appendChild(btn);
+      });
+
+      document.getElementById('search').addEventListener('input', function (e) {
+        searchTerm = e.target.value.trim().toLowerCase();
+        applyFilters();
+      });
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById('events-grid');
+      EVENTS.forEach(function (ev, i) {
+        const d = new Date(ev.dateISO + 'T00:00:00');
+        const day = d.getDate();
+        const mon = MONTHS_ABBR[d.getMonth()];
+
+        const card = document.createElement('article');
+        card.className = 'event-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.innerHTML =
+          '<div class="photo-wrap">' +
+            '<img class="event-photo" alt="' + escapeHTML(ev.title) + '">' +
+            '<div class="date-badge"><div class="day">' + day + '</div><div class="mon">' + mon + '</div></div>' +
+            '<span class="cat-tag">' + escapeHTML(catLabel(ev.category)) + '</span>' +
+          '</div>' +
+          '<div class="event-body">' +
+            '<h2 class="event-title">' + escapeHTML(ev.title) + '</h2>' +
+            '<p class="event-meta">🗓️ ' + escapeHTML(ev.timeLabel) + '</p>' +
+            '<p class="event-venue">📍 ' + escapeHTML(ev.venue) + ' · <strong>' + escapeHTML(ev.city) + '</strong></p>' +
+            '<div class="rating-line" data-role="rating"></div>' +
+            '<p class="event-desc">' + escapeHTML(ev.desc) + '</p>' +
+            '<div class="event-footer">' +
+              '<span class="event-price' + (ev.free ? ' free' : '') + '">' + escapeHTML(ev.price) + '</span>' +
+              '<button class="btn-book" type="button">Réserver</button>' +
+            '</div>' +
+          '</div>';
+
+        card.addEventListener('click', function () { selectEvent(i); });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectEvent(i); }
+        });
+        card.querySelector('.btn-book').addEventListener('click', function (e) {
+          e.stopPropagation();
+          alert('Billetterie de démonstration : « ' + ev.title +' » à ' + ev.city + '.');
+        });
+
+        grid.appendChild(card);
+        cardEls[i] = card;
+      });
+    }
+
+    function applyFilters() {
+      let visible = 0;
+      EVENTS.forEach(function (ev, i) {
+        const matchCat = activeCategory === 'all' || ev.category === activeCategory;
+        const haystack = (ev.title + ' ' + ev.venue + ' ' + ev.city + ' ' + ev.desc).toLowerCase();
+        const matchSearch = !searchTerm || haystack.indexOf(searchTerm) !== -1;
+        const show = matchCat && matchSearch;
+        cardEls[i].classList.toggle('hidden', !show);
+        if (markers[i]) markers[i].map = show ? map : null;
+        if (show) visible++;
+      });
+
+      // Message "aucun résultat"
+      const grid = document.getElementById('events-grid');
+      let empty = grid.querySelector('.empty');
+      if (visible === 0) {
+        if (!empty) {
+          empty = document.createElement('p');
+          empty.className = 'empty';
+          empty.textContent = 'Aucun événement ne correspond à votre recherche.';
+          grid.appendChild(empty);
+        }
+      } else if (empty) {
+        empty.remove();
+      }
+
+      document.getElementById('result-count').textContent =
+        visible + ' événement' + (visible > 1 ? 's' : '');
+    }
+
+    function selectEvent(i) {
+      const marker = markers[i];
+
+      if (activeIndex >= 0 && cardEls[activeIndex]) {
+        cardEls[activeIndex].classList.remove('active');
+      }
+      activeIndex = i;
+      cardEls[i].classList.add('active');
+      cardEls[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      if (!marker || !map) return;
+
+      map.panTo(marker.position);
+      map.setZoom(14);
+
+      markers.forEach(function (m, idx) {
+        if (!m) return;
+        m.content = makePin(EVENTS[idx], idx === i);
+        m.zIndex = idx === i ? 999 : 1;
+      });
+
+      const ev = EVENTS[i];
+      const ratingTxt = ev._rating
+        ? '<div style="color:#f5a623">' + starString(ev._rating) + ' ' + ev._rating.toFixed(1) +
+          ' <span style="color:#888">(' + (ev._count || 0) + ' avis sur le lieu)</span></div>'
+        : '';
+      infoWindow.setContent(
+        '<div style="font-family:sans-serif;max-width:240px">' +
+          '<strong style="font-size:1rem;color:#1e0a3c">' + escapeHTML(ev.title) + '</strong>' +
+          '<div style="font-size:.8rem;color:#d1410c;margin-top:2px">🗓️ ' + escapeHTML(ev.timeLabel) + '</div>' +
+          '<div style="font-size:.8rem;color:#666;margin-top:2px">📍 ' + escapeHTML(ev.venue) + ' · ' + escapeHTML(ev.city) + '</div>' +
+          ratingTxt +
+          '<div style="font-size:.85rem;font-weight:700;color:#1e0a3c;margin-top:4px">' + escapeHTML(ev.price) + '</div>' +
+        '</div>'
+      );
+      infoWindow.open({ map: map, anchor: marker });
+    }
+
+    // Emoji par catégorie pour les marqueurs
+    function catEmoji(key) {
+      return ({
+        musique: '🎵', festival: '🎉', sport: '⚽',
+        spectacle: '🎭', expo: '🎨', gastro: '🍷', famille: '🎡'
+      })[key] || '📍';
+    }
+
+    function makePin(ev, active) {
+      const wrap = document.createElement('div');
+      const size = active ? 38 : 30;
+      wrap.style.cssText =
+        'font-size:' + (active ? 18 : 15) + 'px;' +
+        'width:' + size + 'px;height:' + size + 'px;' +
+        'display:flex;align-items:center;justify-content:center;border-radius:50% 50% 50% 0;' +
+        'background:' + (active ? '#d1410c' : '#1e0a3c') + ';' +
+        'box-shadow:0 2px 6px rgba(0,0,0,.4);border:2px solid #fff;' +
+        'transform:rotate(-45deg) scale(' + (active ? 1.05 : 1) + ');';
+      const inner = document.createElement('span');
+      inner.textContent = catEmoji(ev.category);
+      inner.style.transform = 'rotate(45deg)';
+      wrap.appendChild(inner);
+      return wrap;
+    }
+
+    async function initMap() {
+      const { Map, InfoWindow } = await google.maps.importLibrary('maps');
+      const { Place } = await google.maps.importLibrary('places');
+      const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+
+      map = new Map(document.getElementById('map'), {
+        center: CITY_CENTER,
+        zoom: 11,
+        mapId: 'EVENEMENTS_TOULOUSE_MAP',
+        mapTypeControl: false,
+        streetViewControl: false,
+        gestureHandling: 'greedy'
+      });
+      infoWindow = new InfoWindow();
+
+      for (let i = 0; i < EVENTS.length; i++) {
+        const ev = EVENTS[i];
+        let position = ev.fallback;
+        let photoUri = null;
+
+        try {
+          const res = await Place.searchByText({
+            textQuery: ev.query,
+            fields: ['displayName', 'location', 'photos', 'rating', 'userRatingCount'],
+            maxResultCount: 1,
+            locationBias: CITY_CENTER
+          });
+          const place = res.places && res.places[0];
+          if (place) {
+            if (place.location) {
+              position = { lat: place.location.lat(), lng: place.location.lng() };
+            }
+            if (place.rating) {
+              ev._rating = place.rating;
+              ev._count = place.userRatingCount || 0;
+            }
+            if (place.photos && place.photos.length) {
+              photoUri = place.photos[0].getURI({ maxWidth: 640, maxHeight: 360 });
+            }
+          }
+        } catch (e) {
+          // garde le fallback ; la note restera vide
+        }
+
+        const card = cardEls[i];
+        if (photoUri) card.querySelector('.event-photo').src = photoUri;
+        const ratingEl = card.querySelector('[data-role="rating"]');
+        if (ev._rating) {
+          ratingEl.innerHTML =
+            '<span class="stars">' + starString(ev._rating) + '</span>' +
+            '<span>' + ev._rating.toFixed(1) + ' · lieu noté par ' + ev._count + ' visiteurs</span>';
+        }
+
+        const marker = new AdvancedMarkerElement({
+          map: map,
+          position: position,
+          title: ev.title,
+          content: makePin(ev, false)
+        });
+        marker.addListener('click', function () { selectEvent(i); });
+        markers[i] = marker;
+      }
+
+      // Respecte le filtre courant (au cas où l'utilisateur a déjà filtré)
+      applyFilters();
+    }
+
+    function onMapsError() {
+      document.getElementById('map-fallback').style.display = 'flex';
+    }
+
+    // Initialisation
+    (function init() {
+      buildFilters();
+      buildGrid();
+      applyFilters();
+
+      const s = document.createElement('script');
+      s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GOOGLE_MAPS_API_KEY +
+              '&libraries=places,marker&v=weekly&loading=async&callback=initMap';
+      s.async = true;
+      s.onerror = onMapsError;
+      window.gm_authFailure = onMapsError;
+      window.initMap = initMap;
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
